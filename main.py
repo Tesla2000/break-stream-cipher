@@ -21,12 +21,14 @@ def parse_cryptogram(line) -> str:
     chars = []
     tmp = str(line).split(' ')
     for ch in tmp:
-        chars.append(chr(int(ch, 2)))
+        if ch != "\n":
+            chars.append(chr(int(ch, 2)))
     return "".join(chars)
 
 # messages must be the same length (or padded) to reuse the same key, here we XOR with the length of the shorter message
-
-cryptograms = get_cryptograms("data.txt")
+input = "data_arc.txt"
+output = "output_arc.txt"
+cryptograms = get_cryptograms(input)
 
 # frequency of letters in polish (only ASCII characters) (e.g. ą + a freq in a), alphabet
 frequency = {'a': 99, 'e': 87, 'o': 86, 'i': 82, 'z': 65, 'n': 57,
@@ -44,10 +46,10 @@ for i in range(48, 58):
 for i in range(65, 91):
     frequency[chr(i)] = math.ceil(frequency[chr(i + 32)] * 3 / 4)
 
-# add other symbols, 0% frequency
-for i in range(32, 128):
-    if not chr(i) in frequency:
-        frequency[chr(i)] = 1
+# # add other symbols, 0% frequency
+# for i in range(32, 128):
+#     if not chr(i) in frequency:
+#         frequency[chr(i)] = 0
 
 key_best = []
 # find the longest cryptogram
@@ -69,7 +71,7 @@ for i, c in enumerate(cryptograms[longest_idx]):
                 count_length += 1
                 result = XOR_char(XOR_char(c, match[i]), alpha)
                 # if result is a valid character, then there's a chance that guess is correct
-                if 32 <= ord(result) <= 126:
+                if result in frequency:
                     count += 1
         # gave valid letter in the remained cryptograms of valid length
         if count == count_length:
@@ -90,8 +92,9 @@ for i, c in enumerate(cryptograms[longest_idx]):
 
 key = "".join(key_best)
 # output
-with open('output.txt', 'w') as file:
+with open(output, 'w') as file:
     for c in cryptograms:
-        file.write(XOR_str(c, key))
-        file.write('\n')
+        # file.write(XOR_str(c, key))
+        # file.write('\n')
+        print(XOR_str(c, key))
 
