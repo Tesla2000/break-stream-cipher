@@ -26,8 +26,8 @@ def parse_cryptogram(line) -> str:
     return "".join(chars)
 
 # messages must be the same length (or padded) to reuse the same key, here we XOR with the length of the shorter message
-input = "data_arc.txt"
-output = "output_arc.txt"
+input = "data.txt"
+output = "output_c1.txt"
 cryptograms = get_cryptograms(input)
 
 # frequency of letters in polish (only ASCII characters) (e.g. ą + a freq in a), alphabet
@@ -45,6 +45,7 @@ for i in range(48, 58):
 # uppercase letters, 3/4 frequency of lowercase
 for i in range(65, 91):
     frequency[chr(i)] = math.ceil(frequency[chr(i + 32)] * 3 / 4)
+    #frequency[chr(i)] = 10
 
 # # add other symbols, 0% frequency
 # for i in range(32, 128):
@@ -73,8 +74,10 @@ for i, c in enumerate(cryptograms[longest_idx]):
                 # if result is a valid character, then there's a chance that guess is correct
                 if result in frequency:
                     count += 1
+                else:
+                    break
         # gave valid letter in the remained cryptograms of valid length
-        if count == count_length:
+        if count == count_length and count_length != 0:
             possible.append(alpha)  # possible p_1
     # frequency analysis on p_2, find character of p_1, use p_1 which produces the most used chars in all streams
     if len(possible) > 0:
@@ -88,13 +91,14 @@ for i, c in enumerate(cryptograms[longest_idx]):
             if curr_freq >= best_freq:
                 best_char = char
                 best_freq = curr_freq
-        key_best.append(XOR_char(best_char, c))
+    else:
+        best_char = ' '  # neutral, changes upper case to lowercase and vice versa
+    key_best.append(XOR_char(best_char, c))
 
 key = "".join(key_best)
 # output
-with open(output, 'w') as file:
-    for c in cryptograms:
-        # file.write(XOR_str(c, key))
-        # file.write('\n')
-        print(XOR_str(c, key))
-
+#with open(output, 'w') as file:
+for c in cryptograms:
+    # file.write(XOR_str(c, key))
+    # file.write('\n')
+    print(XOR_str(c, key))
