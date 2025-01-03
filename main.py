@@ -1,16 +1,21 @@
 import math
+from collections.abc import Sequence
+from os import PathLike
+from typing import Union
 
-def XOR_str(str1, str2):
+from protocols.protocols import CharSequence
+
+def XOR_str(str1: Sequence[CharSequence], str2: Sequence[CharSequence]):
     if len(str1) > len(str2):
         return "".join([chr(ord(x) ^ ord(y)) for x, y in zip(str1[:len(str2)], str2)])
     else:
         return "".join([chr(ord(x) ^ ord(y)) for x, y in zip(str1, str2[:len(str1)])])
 
 
-def XOR_char(c1, c2):
+def XOR_char(c1: CharSequence, c2: CharSequence):
     return chr(ord(c1) ^ ord(c2))
 
-def get_cryptograms(name) -> []:
+def get_cryptograms(name: Union[PathLike[bytes], PathLike[str], bytes, int, str]) -> []:
     cryp = []
     with open(name, 'r') as file:
         for line in file:
